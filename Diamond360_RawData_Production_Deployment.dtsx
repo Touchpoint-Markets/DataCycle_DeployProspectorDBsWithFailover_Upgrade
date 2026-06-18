@@ -11,34 +11,10 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Diamond360_RawData_Production_Deployment"
   DTS:PackageType="5"
-  DTS:VersionBuild="37"
-  DTS:VersionGUID="{C93E402E-642C-471E-83C1-C2A60CD57CDF}">
+  DTS:VersionBuild="49"
+  DTS:VersionGUID="{E3ABB645-07F5-455D-9E04-578595447819}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
-  <DTS:ConnectionManagers>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[CINPSQL21]"
-      DTS:CreationName="ADO.NET:SQL"
-      DTS:DTSID="{63D1E2B0-E900-4BCC-B263-2E6CCDA3D58D}"
-      DTS:ObjectName="CINPSQL21">
-      <DTS:ObjectData>
-        <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=10.9.57.8;User ID=jdauser;Persist Security Info=True;Connect Timeout=30;Application Name=SSIS-Diamond360_RawData_Production_Deployment-{63D1E2B0-E900-4BCC-B263-2E6CCDA3D58D}CINPSQL21;" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-    <DTS:ConnectionManager
-      DTS:refId="Package.ConnectionManagers[SMTP Connection Manager]"
-      DTS:CreationName="SMTP"
-      DTS:Description="SBMedia"
-      DTS:DTSID="{AA38AFE5-E1B1-4EC4-A308-C5039874B45A}"
-      DTS:ObjectName="SMTP Connection Manager">
-      <DTS:ObjectData>
-        <SmtpConnectionManager
-          ConnectionString="SmtpServer=smtp-relay.gmail.com;UseWindowsAuthentication=True;EnableSsl=True;"
-          ConnectByProxy="False" />
-      </DTS:ObjectData>
-    </DTS:ConnectionManager>
-  </DTS:ConnectionManagers>
   <DTS:Variables />
   <DTS:Executables>
     <DTS:Executable
@@ -56,7 +32,8 @@
           Name="ST_034e997d0dbf4d589a41e5ca8ff48c20"
           VSTAMajorVersion="17"
           VSTAMinorVersion="0"
-          Language="CSharp">
+          Language="CSharp"
+          ReadOnlyVariables="$Project::SMTPServer,$Project::SMTPUserName,$Project::SMTPPassword">
           <ProjectItem
             Name="ScriptMain.cs"
             Encoding="UTF8"><![CDATA[#region Namespaces
@@ -75,58 +52,31 @@ namespace ST_d1dcc50421ce46b99a9df5840ebc69a9
     {
         public void Main()
         {
-            //string htmlMessageTo = Dts.Variables["HtmlEmailTo"].Value.ToString();
-            //string htmlMessageCC = Dts.Variables["HtmlEmailCC"].Value.ToString();
-            //string htmlMessageFrom = Dts.Variables["HtmlEmailFrom"].Value.ToString();
-            //string htmlMessageSubject = Dts.Variables["HtmlEmailSubject"].Value.ToString();
-            //string htmlMessageBody = Dts.Variables["LoadCounts"].Value.ToString();
-            string smtpServer = "email-smtp.us-east-1.amazonaws.com";
+            string smtpServer = Dts.Variables["$Project::SMTPServer"].Value.ToString();
+            string smtpUserName = Dts.Variables["$Project::SMTPUserName"].Value.ToString();
+            string smtpPassword = Dts.Variables["$Project::SMTPPassword"].Value.ToString();
 
             System.Net.ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
             string formattedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             MailMessage htmlMessage = new MailMessage();
             SmtpClient mySmtpClient;
 
-            htmlMessage.From = new MailAddress("Diamond360DataCycle@judydiamond.com");
+            htmlMessage.From = new MailAddress("Diamond360DataCycle@arc-network.com");
             htmlMessage.To.Add(new MailAddress("harshah@synoptek.com"));
-            htmlMessage.CC.Add("eryles@alm.com,kveltri@alm.com,lkruetzkamp@alm.com,hvaghasiya@synoptek.com,pallavi.dongle@infobeans.com,rlubke@alm.com,nitin.jain@infobeans.com,mbhavsar@synoptek.com");
+            htmlMessage.CC.Add("Eric.ryles@arc-network.com,lkruetzkamp@alm.com,hvaghasiya@synoptek.com,pallavi.dongle@infobeans.com,Ron.Lubke@arc-network.com,nitin.jain@infobeans.com,mbhavsar@synoptek.com");
             htmlMessage.Subject = "Diamond360_RawData_Production_Deployment" + " Completed Succesfully @ " + formattedDate;
             htmlMessage.IsBodyHtml = true;
             htmlMessage.Body = null;
 
             mySmtpClient = new SmtpClient(smtpServer);
             mySmtpClient.Port = 587;
-            mySmtpClient.Credentials = new NetworkCredential("AKIATN243CRFEH4NLTVX", "BHsyt7c3xysQ7TfkDODRbF+Lew7+x3goEJDzt1n65BK9");
+            mySmtpClient.Credentials = new NetworkCredential(smtpUserName, smtpPassword);
             mySmtpClient.EnableSsl = true;
             mySmtpClient.Send(htmlMessage);
-
-            //SendMailMessage(htmlMessageFrom, htmlMessageTo, htmlMessageCC, htmlMessageSubject, htmlMessageBody, true, smtpServer);
 
             Dts.TaskResult = (int)ScriptResults.Success;
 
         }
-
-        //private void SendMailMessage(string From, string To, string CC, string Subject, string Body, bool IsBodyHtml, string Server)
-        //{
-        //    System.Net.ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-        //    string formattedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        //    MailMessage htmlMessage = new MailMessage();
-        //    SmtpClient mySmtpClient;
-
-        //    htmlMessage.From = new MailAddress("Diamond360DataCycle@judydiamond.com");
-        //    htmlMessage.To.Add(new MailAddress("harshah@synoptek.com"));
-        //    htmlMessage.CC.Add("hvaghasiya@synoptek.com,mbhavsar@synoptek.com");
-        //    htmlMessage.Subject = "Diamond360_RawData_LoadWithDOLData" + " Completed Succesfully @ " + formattedDate;
-        //    htmlMessage.IsBodyHtml = IsBodyHtml;
-        //    htmlMessage.Body = Body;
-
-        //    mySmtpClient = new SmtpClient(Server);
-        //    mySmtpClient.Port = 587;
-        //    mySmtpClient.Credentials = new NetworkCredential("AKIATN243CRFEH4NLTVX", "BHsyt7c3xysQ7TfkDODRbF+Lew7+x3goEJDzt1n65BK9");
-        //    mySmtpClient.EnableSsl = true;
-        //    mySmtpClient.Send(htmlMessage);
-
-        //}
 
         enum ScriptResults
         {
@@ -378,7 +328,7 @@ namespace ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties {
     <msb:CodeName>ST_034e997d0dbf4d589a41e5ca8ff48c20</msb:CodeName>
     <msb:Language>msBuild</msb:Language>
     <msb:DisplayName>ST_034e997d0dbf4d589a41e5ca8ff48c20</msb:DisplayName>
-    <msb:ProjectId>{590861A8-8DF9-4A27-9DBC-3C775F9322B3}</msb:ProjectId>
+    <msb:ProjectId>{2DFC369A-AE8F-40DB-AF32-C98BFCAD9CCE}</msb:ProjectId>
   </msb:PropertyGroup>
   <msb:ItemGroup>
     <msb:Project Include="ST_034e997d0dbf4d589a41e5ca8ff48c20.csproj" />
@@ -500,113 +450,113 @@ namespace ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties {
           <BinaryItem
             Name="ST_034e997d0dbf4d589a41e5ca8ff48c20.dll">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
-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
+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
-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
+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
-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
+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
-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
-ALkA3QQVAMkA3QQGANEAAQQjAIEAWQYpAIEAEAMuAHkA3QQGAOEA3QQQAHkAKwQzAHkAogQ5AAwA
-dwBFAHkAXwA5AOkAdwAQAPkA8gVLAHkAAAYQAHkA8gNRAHkAYQYQAAEB3QQQAAEBPQYBAAkB3QRW
-AAEBuAVcAAEBFgRRAAEBewBjAHEA3AVpABkBIwYBAHEA3QQGAJkA3QQGACEBrgBvACEBagZ4AKEA
-3QR+AMEA3QQGAAgAFACYAAgAGACdACkAcwAFAS4ACwDdAC4AEwDmAC4AGwAFAS4AIwAOAS4AKwA3
-AS4AMwA3AS4AOwA3AS4AQwAOAS4ASwA9AS4AUwA3AS4AWwBUAUMAYwCdAEkAcwAFAWEAewCdAGMA
-awCdABsAAwABAAQAAwAAALkEzgAAAAYB0wAAABsG2AACAAQAAwACAAUABQABAAYABQACAAcABwA+
-AASAAAABAAAAwCU1cwAAAAAAAAEAAAAEAAAAAAAAAAAAAACGAG4AAAAAABEAAAAAAAAAAAAAAI8A
-GQMAAAAABAAAAAAAAAAAAAAAhgAkBAAAAAAAAAAAAQAAAC4FAAAFAAIAAAAAU1RfMDM0ZTk5N2Qw
-ZGJmNGQ1ODlhNDFlNWNhOGZmNDhjMjAAQ29sbGVjdGlvbmAxAFNUX2QxZGNjNTA0MjFjZTQ2Yjk5
-YTlkZjU4NDBlYmM2OWE5ADxNb2R1bGU+AGdldF9DQwB2YWx1ZV9fAG1zY29ybGliAEFkZABTZW5k
-AGRlZmF1bHRJbnN0YW5jZQBNYWlsTWVzc2FnZQBSdW50aW1lVHlwZUhhbmRsZQBHZXRUeXBlRnJv
-bUhhbmRsZQBEYXRlVGltZQBTZWN1cml0eVByb3RvY29sVHlwZQBGYWlsdXJlAGdldF9DdWx0dXJl
-AHNldF9DdWx0dXJlAHJlc291cmNlQ3VsdHVyZQBWU1RBUlRTY3JpcHRPYmplY3RNb2RlbEJhc2UA
-QXBwbGljYXRpb25TZXR0aW5nc0Jhc2UARWRpdG9yQnJvd3NhYmxlU3RhdGUAQ29tcGlsZXJHZW5l
-cmF0ZWRBdHRyaWJ1dGUARGVidWdnZXJOb25Vc2VyQ29kZUF0dHJpYnV0ZQBEZWJ1Z2dhYmxlQXR0
-cmlidXRlAEVkaXRvckJyb3dzYWJsZUF0dHJpYnV0ZQBBc3NlbWJseVRpdGxlQXR0cmlidXRlAEFz
-c2VtYmx5VHJhZGVtYXJrQXR0cmlidXRlAFRhcmdldEZyYW1ld29ya0F0dHJpYnV0ZQBBc3NlbWJs
-eUNvbmZpZ3VyYXRpb25BdHRyaWJ1dGUAQXNzZW1ibHlEZXNjcmlwdGlvbkF0dHJpYnV0ZQBDb21w
-aWxhdGlvblJlbGF4YXRpb25zQXR0cmlidXRlAEFzc2VtYmx5UHJvZHVjdEF0dHJpYnV0ZQBBc3Nl
-bWJseUNvcHlyaWdodEF0dHJpYnV0ZQBTU0lTU2NyaXB0VGFza0VudHJ5UG9pbnRBdHRyaWJ1dGUA
-QXNzZW1ibHlDb21wYW55QXR0cmlidXRlAFJ1bnRpbWVDb21wYXRpYmlsaXR5QXR0cmlidXRlAHZh
-bHVlAFN5c3RlbS5SdW50aW1lLlZlcnNpb25pbmcAVG9TdHJpbmcATWljcm9zb2Z0LlNxbFNlcnZl
-ci5TY3JpcHRUYXNrAE1pY3Jvc29mdC5TcWxTZXJ2ZXIuRHRzLlRhc2tzLlNjcmlwdFRhc2sATmV0
-d29ya0NyZWRlbnRpYWwAU3lzdGVtLkNvbGxlY3Rpb25zLk9iamVjdE1vZGVsAFNjcmlwdE9iamVj
-dE1vZGVsAFN5c3RlbS5Db21wb25lbnRNb2RlbABTeXN0ZW0uTmV0Lk1haWwAU1RfMDM0ZTk5N2Qw
-ZGJmNGQ1ODlhNDFlNWNhOGZmNDhjMjAuZGxsAHNldF9Jc0JvZHlIdG1sAHNldF9TZWN1cml0eVBy
-b3RvY29sAHNldF9FbmFibGVTc2wAU3lzdGVtAHNldF9Gcm9tAEVudW0AcmVzb3VyY2VNYW4AU2Ny
-aXB0TWFpbgBTeXN0ZW0uQ29uZmlndXJhdGlvbgBTeXN0ZW0uR2xvYmFsaXphdGlvbgBTeXN0ZW0u
-UmVmbGVjdGlvbgBNYWlsQWRkcmVzc0NvbGxlY3Rpb24AZ2V0X1RvAEN1bHR1cmVJbmZvAGdldF9S
-ZXNvdXJjZU1hbmFnZXIAU2VydmljZVBvaW50TWFuYWdlcgAuY3RvcgAuY2N0b3IAU3lzdGVtLkRp
-YWdub3N0aWNzAFN5c3RlbS5SdW50aW1lLkNvbXBpbGVyU2VydmljZXMAU3lzdGVtLlJlc291cmNl
-cwBTVF9kMWRjYzUwNDIxY2U0NmI5OWE5ZGY1ODQwZWJjNjlhOS5Qcm9wZXJ0aWVzLlJlc291cmNl
-cy5yZXNvdXJjZXMARGVidWdnaW5nTW9kZXMAU1RfZDFkY2M1MDQyMWNlNDZiOTlhOWRmNTg0MGVi
-YzY5YTkuUHJvcGVydGllcwBTZXR0aW5ncwBzZXRfQ3JlZGVudGlhbHMAU3VjY2VzcwBNYWlsQWRk
-cmVzcwBnZXRfRHRzAFNjcmlwdFJlc3VsdHMAQ29uY2F0AE9iamVjdABzZXRfU3ViamVjdABTeXN0
-ZW0uTmV0AGdldF9EZWZhdWx0AHNldF9UYXNrUmVzdWx0AFNtdHBDbGllbnQAc2V0X1BvcnQASUNy
-ZWRlbnRpYWxzQnlIb3N0AGdldF9Ob3cAc2V0X0JvZHkAZ2V0X0Fzc2VtYmx5AAAARWUAbQBhAGkA
-bAAtAHMAbQB0AHAALgB1AHMALQBlAGEAcwB0AC0AMQAuAGEAbQBhAHoAbwBuAGEAdwBzAC4AYwBv
-AG0AASd5AHkAeQB5AC0ATQBNAC0AZABkACAASABIADoAbQBtADoAcwBzAAFHRABpAGEAbQBvAG4A
-ZAAzADYAMABEAGEAdABhAEMAeQBjAGwAZQBAAGoAdQBkAHkAZABpAGEAbQBvAG4AZAAuAGMAbwBt
-AAApaABhAHIAcwBoAGEAaABAAHMAeQBuAG8AcAB0AGUAawAuAGMAbwBtAACBS2UAcgB5AGwAZQBz
-AEAAYQBsAG0ALgBjAG8AbQAsAGsAdgBlAGwAdAByAGkAQABhAGwAbQAuAGMAbwBtACwAbABrAHIA
-dQBlAHQAegBrAGEAbQBwAEAAYQBsAG0ALgBjAG8AbQAsAGgAdgBhAGcAaABhAHMAaQB5AGEAQABz
-AHkAbgBvAHAAdABlAGsALgBjAG8AbQAsAHAAYQBsAGwAYQB2AGkALgBkAG8AbgBnAGwAZQBAAGkA
-bgBmAG8AYgBlAGEAbgBzAC4AYwBvAG0ALAByAGwAdQBiAGsAZQBAAGEAbABtAC4AYwBvAG0ALABu
-AGkAdABpAG4ALgBqAGEAaQBuAEAAaQBuAGYAbwBiAGUAYQBuAHMALgBjAG8AbQAsAG0AYgBoAGEA
-dgBzAGEAcgBAAHMAeQBuAG8AcAB0AGUAawAuAGMAbwBtAACAg0QAaQBhAG0AbwBuAGQAMwA2ADAA
-XwBSAGEAdwBEAGEAdABhAF8AUAByAG8AZAB1AGMAdABpAG8AbgBfAEQAZQBwAGwAbwB5AG0AZQBu
-AHQAIABDAG8AbQBwAGwAZQB0AGUAZAAgAFMAdQBjAGMAZQBzAGYAdQBsAGwAeQAgAEAAIAAAKUEA
-SwBJAEEAVABOADIANAAzAEMAUgBGAEUASAA0AE4ATABUAFYAWAAAWUIASABzAHkAdAA3AGMAMwB4
-AHkAcwBRADcAVABmAGsARABPAEQAUgBiAEYAKwBMAGUAdwA3ACsAeAAzAGcAbwBFAEoARAB6AHQA
-MQBuADYANQBCAEsAOQAAcVMAVABfAGQAMQBkAGMAYwA1ADAANAAyADEAYwBlADQANgBiADkAOQBh
-ADkAZABmADUAOAA0ADAAZQBiAGMANgA5AGEAOQAuAFAAcgBvAHAAZQByAHQAaQBlAHMALgBSAGUA
-cwBvAHUAcgBjAGUAcwAAAAAAoimDnczHq0WUq+0gEYKY7gAEIAEBCAMgAAEFIAEBEREEIAEBDgUg
-AQERWQcHAw4SPRFBBQABARFtBAAAEUEEIAEODgUgAQEScQQgABJ1BhUSeQEScQUgAQETAAUAAg4O
-DgQgAQECBSACAQ4OBiABARKAiQUgAQESPQUgABKAjQgAARKAkRGAlQUgABKAmQcgAgEOEoCZCLd6
-XFYZNOCJCImEXc2AgMyRBAAAAAAEAQAAAAMGElEDBhJVAwYSEAIGCAMGERQEAAASUQQAABJVBQAB
-ARJVBAAAEhADAAABBAgAElEECAASVQQIABIQCAEACAAAAAAAHgEAAQBUAhZXcmFwTm9uRXhjZXB0
-aW9uVGhyb3dzAQgBAAIAAAAAACgBACNTVF9kMWRjYzUwNDIxY2U0NmI5OWE5ZGY1ODQwZWJjNjlh
-OQAABQEAAAAAFgEAEUNvcHlyaWdodCBAICAyMDEzAABJAQAaLk5FVEZyYW1ld29yayxWZXJzaW9u
-PXY0LjcBAFQOFEZyYW1ld29ya0Rpc3BsYXlOYW1lEi5ORVQgRnJhbWV3b3JrIDQuNwAAtAAAAM7K
-774BAAAAkQAAAGxTeXN0ZW0uUmVzb3VyY2VzLlJlc291cmNlUmVhZGVyLCBtc2NvcmxpYiwgVmVy
-c2lvbj00LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkz
-NGUwODkjU3lzdGVtLlJlc291cmNlcy5SdW50aW1lUmVzb3VyY2VTZXQCAAAAAAAAAAAAAABQQURQ
-QURQtAAAAOQyAAAAAAAAAAAAAP4yAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwMgAAAAAAAAAA
-AAAAAF9Db3JEbGxNYWluAG1zY29yZWUuZGxsAAAAAAD/JQAgABAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+LnJlbG9jAAAMAAAAAGAAAAACAAAAHAAAAAAAAAAAAAAAAAAAQAAAQgAAAAAAAAAAAAAAAAAAAAC8
+MwAAAAAAAEgAAAACAAUA0CEAAAARAAABAAAAAAAAANAyAAC4AAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAABMwBAAOAQAAAQAAEQIoEAAACm8RAAAKcgEAAHBvEgAACm8T
+AAAKbxQAAAoCKBAAAApvEQAACnIrAABwbxIAAApvEwAACm8UAAAKCgIoEAAACm8RAAAKclkAAHBv
+EgAACm8TAAAKbxQAAAoLIAAMAAAoFQAACigWAAAKEwQSBHKHAABwKBcAAAoMcxgAAAoNCXKvAABw
+cxkAAApvGgAACglvGwAACnL3AABwcxkAAApvHAAACglvHQAACnIhAQBwbx4AAAoJcnwCAHAIKB8A
+AApvIAAACgkXbyEAAAoJFG8iAAAKcyMAAAolIEsCAABvJAAACiUGB3MlAAAKbyYAAAolF28nAAAK
+CW8oAAAKAigQAAAKFm8pAAAKKh4CKCoAAAoqHgIoKwAACiqufgEAAAQtHnIBAwBw0AMAAAIoLAAA
+Cm8tAAAKcy4AAAqAAQAABH4BAAAEKhp+AgAABCoeAoACAAAEKhp+AwAABCoeAigvAAAKKi5zCAAA
+BoADAAAEKkJTSkIBAAEAAAAAAAwAAAB2NC4wLjMwMzE5AAAAAAUAbAAAAHwEAAAjfgAA6AQAAOAG
+AAAjU3RyaW5ncwAAAADICwAAdAMAACNVUwA8DwAAEAAAACNHVUlEAAAATA8AALQBAAAjQmxvYgAA
+AAAAAAACAAABVx2iCQkDAAAA+gEzABYAAAEAAAAoAAAABQAAAAYAAAAJAAAAAQAAAC8AAAACAAAA
+EAAAAAEAAAACAAAAAwAAAAQAAAABAAAAAQAAAAQAAAABAAAAAQAAAAAAHAQBAAAAAAAGAIsCWAUG
+ABoDWAUGANcBRQUPAMwFAAAGAAQC1QQGAG4C1QQGAE8C1QQGAAED1QQGAKsC1QQGAMQC1QQGABsC
+1QQGADYCSAMKAN8CigMKAFYBigMOAK8ADAQGAOgAfwQGAI8EfwQGALoBRQUGAGIGfwQGABQFeAUG
+AAQFwAQOAIoB9gMOAOsB9gMOAHIBqwQGAJ8BWAUKAOQDigMSAA4G8QASALsA8QAOACQFdQYOABEB
+dQYOADkGDAQOAOcEDAQGACUAxQMGAGQDfwQOAJsGDAQOALMDdQYOAK8GdQYGACEBfwQGAMQAfwQG
+ANcG1QQAAAAAVgAAAAAAAQABAAEAEACgBDIAOQABAAEAAAAQAH8F2wVNAAEAAwAAARAAGAbbBWEA
+AwAHAAMBAABNBgAARQAEAAoAEQCUBLgAEQBGAbwAEQCfAMAABgaFAMQAVoAxBscAVoAmAccAUCAA
+AAAAhgCmBAYAAQBqIQAAAACGGDgFBgABAHIhAAAAAIMYOAUGAAEAeiEAAAAAkwgQBcsAAQCmIQAA
+AACTCC4B0AABAK0hAAAAAJMIOgHVAAEAtSEAAAAAlgiABtsAAgC8IQAAAACGGDgFBgACAMQhAAAA
+AJEYPgXgAAIAAAABAEIDCQA4BQEAEQA4BQYAGQA4BQoAKQA4BRAAMQA4BRAAOQA4BRAAQQA4BRAA
+SQA4BRAAUQA4BRAAWQA4BRAAYQA4BRAAaQA4BQYAkQA4BQYAuQA4BRUAyQA4BQYAcQBFBiUA0QAK
+BioA2QB2BC8A4QA4AzUAmQBiAzkA6QBTBD0AgQDCBkMAgQBiA0gAeQA4BQYA+QA4BRAAeQCGBE0A
+eQD9BFMADACWAGEAeQBfAFMAAQGWABAAEQFbBmcAeQBpBhAAeQBEBG0AeQDKBhAAGQE4BRAAGQGm
+BgEAIQE4BXIAGQEhBngAGQFoBG0AGQGaAH8A0QCMBgEAcQA4BQYAmQA4BQYAMQHWAIUAMQHTBo4A
+oQA4BZQAwQA4BQYACAAUAK4ACAAYALMAKQBzABsBLgALAPMALgATAPwALgAbABsBLgAjACQBLgAr
+AE0BLgAzAE0BLgA7AE0BLgBDACQBLgBLAFMBLgBTAE0BLgBbAGoBQwBjALMASQBzABsBYQB7ALMA
+YwBrALMAGwADAAEABAADAAAAFAXkAAAATgHpAAAAhAbuAAIABAADAAIABQAFAAEABgAFAAIABwAH
+AFkABIAAAAEAAADBJWlOAAAAAAAAAQAAAAQAAAAAAAAAAAAAAJwAjQAAAAAAEQAAAAAAAAAAAAAA
+pQBrAwAAAAAEAAAAAAAAAAAAAACcAH8EAAAAABEAAAAAAAAAAAAAAKUAZgAAAAAAAAAAAAEAAACJ
+BQAABQACAAAAAFNUXzAzNGU5OTdkMGRiZjRkNTg5YTQxZTVjYThmZjQ4YzIwAENvbGxlY3Rpb25g
+MQBTVF9kMWRjYzUwNDIxY2U0NmI5OWE5ZGY1ODQwZWJjNjlhOQA8TW9kdWxlPgBnZXRfQ0MATWlj
+cm9zb2Z0LlNxbFNlcnZlci5NYW5hZ2VkRFRTAHZhbHVlX18AbXNjb3JsaWIAQWRkAFNlbmQAZGVm
+YXVsdEluc3RhbmNlAE1haWxNZXNzYWdlAFZhcmlhYmxlAFJ1bnRpbWVUeXBlSGFuZGxlAEdldFR5
+cGVGcm9tSGFuZGxlAERhdGVUaW1lAE1pY3Jvc29mdC5TcWxTZXJ2ZXIuRHRzLlJ1bnRpbWUAU2Vj
+dXJpdHlQcm90b2NvbFR5cGUARmFpbHVyZQBnZXRfQ3VsdHVyZQBzZXRfQ3VsdHVyZQByZXNvdXJj
+ZUN1bHR1cmUAVlNUQVJUU2NyaXB0T2JqZWN0TW9kZWxCYXNlAEFwcGxpY2F0aW9uU2V0dGluZ3NC
+YXNlAEVkaXRvckJyb3dzYWJsZVN0YXRlAENvbXBpbGVyR2VuZXJhdGVkQXR0cmlidXRlAERlYnVn
+Z2VyTm9uVXNlckNvZGVBdHRyaWJ1dGUARGVidWdnYWJsZUF0dHJpYnV0ZQBFZGl0b3JCcm93c2Fi
+bGVBdHRyaWJ1dGUAQXNzZW1ibHlUaXRsZUF0dHJpYnV0ZQBBc3NlbWJseVRyYWRlbWFya0F0dHJp
+YnV0ZQBUYXJnZXRGcmFtZXdvcmtBdHRyaWJ1dGUAQXNzZW1ibHlDb25maWd1cmF0aW9uQXR0cmli
+dXRlAEFzc2VtYmx5RGVzY3JpcHRpb25BdHRyaWJ1dGUAQ29tcGlsYXRpb25SZWxheGF0aW9uc0F0
+dHJpYnV0ZQBBc3NlbWJseVByb2R1Y3RBdHRyaWJ1dGUAQXNzZW1ibHlDb3B5cmlnaHRBdHRyaWJ1
+dGUAU1NJU1NjcmlwdFRhc2tFbnRyeVBvaW50QXR0cmlidXRlAEFzc2VtYmx5Q29tcGFueUF0dHJp
+YnV0ZQBSdW50aW1lQ29tcGF0aWJpbGl0eUF0dHJpYnV0ZQBnZXRfVmFsdWUAdmFsdWUAU3lzdGVt
+LlJ1bnRpbWUuVmVyc2lvbmluZwBUb1N0cmluZwBNaWNyb3NvZnQuU3FsU2VydmVyLlNjcmlwdFRh
+c2sATWljcm9zb2Z0LlNxbFNlcnZlci5EdHMuVGFza3MuU2NyaXB0VGFzawBOZXR3b3JrQ3JlZGVu
+dGlhbABTeXN0ZW0uQ29sbGVjdGlvbnMuT2JqZWN0TW9kZWwAU2NyaXB0T2JqZWN0TW9kZWwAU3lz
+dGVtLkNvbXBvbmVudE1vZGVsAFN5c3RlbS5OZXQuTWFpbABTVF8wMzRlOTk3ZDBkYmY0ZDU4OWE0
+MWU1Y2E4ZmY0OGMyMC5kbGwAc2V0X0lzQm9keUh0bWwAc2V0X1NlY3VyaXR5UHJvdG9jb2wAc2V0
+X0VuYWJsZVNzbABnZXRfSXRlbQBTeXN0ZW0Ac2V0X0Zyb20ARW51bQByZXNvdXJjZU1hbgBTY3Jp
+cHRNYWluAFN5c3RlbS5Db25maWd1cmF0aW9uAFN5c3RlbS5HbG9iYWxpemF0aW9uAFN5c3RlbS5S
+ZWZsZWN0aW9uAE1haWxBZGRyZXNzQ29sbGVjdGlvbgBnZXRfVG8AQ3VsdHVyZUluZm8AZ2V0X1Jl
+c291cmNlTWFuYWdlcgBTZXJ2aWNlUG9pbnRNYW5hZ2VyAC5jdG9yAC5jY3RvcgBTeXN0ZW0uRGlh
+Z25vc3RpY3MAU3lzdGVtLlJ1bnRpbWUuQ29tcGlsZXJTZXJ2aWNlcwBTeXN0ZW0uUmVzb3VyY2Vz
+AFNUX2QxZGNjNTA0MjFjZTQ2Yjk5YTlkZjU4NDBlYmM2OWE5LlByb3BlcnRpZXMuUmVzb3VyY2Vz
+LnJlc291cmNlcwBEZWJ1Z2dpbmdNb2RlcwBTVF9kMWRjYzUwNDIxY2U0NmI5OWE5ZGY1ODQwZWJj
+NjlhOS5Qcm9wZXJ0aWVzAGdldF9WYXJpYWJsZXMAU2V0dGluZ3MAc2V0X0NyZWRlbnRpYWxzAFN1
+Y2Nlc3MATWFpbEFkZHJlc3MAZ2V0X0R0cwBTY3JpcHRSZXN1bHRzAENvbmNhdABPYmplY3QAc2V0
+X1N1YmplY3QAU3lzdGVtLk5ldABnZXRfRGVmYXVsdABzZXRfVGFza1Jlc3VsdABTbXRwQ2xpZW50
+AHNldF9Qb3J0AElDcmVkZW50aWFsc0J5SG9zdABnZXRfTm93AHNldF9Cb2R5AGdldF9Bc3NlbWJs
+eQAAKSQAUAByAG8AagBlAGMAdAA6ADoAUwBNAFQAUABTAGUAcgB2AGUAcgAALSQAUAByAG8AagBl
+AGMAdAA6ADoAUwBNAFQAUABVAHMAZQByAE4AYQBtAGUAAC0kAFAAcgBvAGoAZQBjAHQAOgA6AFMA
+TQBUAFAAUABhAHMAcwB3AG8AcgBkAAAneQB5AHkAeQAtAE0ATQAtAGQAZAAgAEgASAA6AG0AbQA6
+AHMAcwABR0QAaQBhAG0AbwBuAGQAMwA2ADAARABhAHQAYQBDAHkAYwBsAGUAQABhAHIAYwAtAG4A
+ZQB0AHcAbwByAGsALgBjAG8AbQABKWgAYQByAHMAaABhAGgAQABzAHkAbgBvAHAAdABlAGsALgBj
+AG8AbQAAgVlFAHIAaQBjAC4AcgB5AGwAZQBzAEAAYQByAGMALQBuAGUAdAB3AG8AcgBrAC4AYwBv
+AG0ALABsAGsAcgB1AGUAdAB6AGsAYQBtAHAAQABhAGwAbQAuAGMAbwBtACwAaAB2AGEAZwBoAGEA
+cwBpAHkAYQBAAHMAeQBuAG8AcAB0AGUAawAuAGMAbwBtACwAcABhAGwAbABhAHYAaQAuAGQAbwBu
+AGcAbABlAEAAaQBuAGYAbwBiAGUAYQBuAHMALgBjAG8AbQAsAFIAbwBuAC4ATAB1AGIAawBlAEAA
+YQByAGMALQBuAGUAdAB3AG8AcgBrAC4AYwBvAG0ALABuAGkAdABpAG4ALgBqAGEAaQBuAEAAaQBu
+AGYAbwBiAGUAYQBuAHMALgBjAG8AbQAsAG0AYgBoAGEAdgBzAGEAcgBAAHMAeQBuAG8AcAB0AGUA
+awAuAGMAbwBtAAGAg0QAaQBhAG0AbwBuAGQAMwA2ADAAXwBSAGEAdwBEAGEAdABhAF8AUAByAG8A
+ZAB1AGMAdABpAG8AbgBfAEQAZQBwAGwAbwB5AG0AZQBuAHQAIABDAG8AbQBwAGwAZQB0AGUAZAAg
+AFMAdQBjAGMAZQBzAGYAdQBsAGwAeQAgAEAAIAAAcVMAVABfAGQAMQBkAGMAYwA1ADAANAAyADEA
+YwBlADQANgBiADkAOQBhADkAZABmADUAOAA0ADAAZQBiAGMANgA5AGEAOQAuAFAAcgBvAHAAZQBy
+AHQAaQBlAHMALgBSAGUAcwBvAHUAcgBjAGUAcwAAAOL3BPR5bf5LrC2F2U3L6FwABCABAQgDIAAB
+BSABARERBCABAQ4FIAEBEVkJBwUODg4SPRFBBCAAEmkEIAASbQUgARJxHAMgABwDIAAOBQABARF5
+BAAAEUEEIAEODgUgAQESfQUgABKAgQcVEoCFARJ9BSABARMABQACDg4OBCABAQIFIAIBDg4GIAEB
+EoCVBSABARI9CAABEoCZEYCdBSAAEoChByACAQ4SgKEIt3pcVhk04IkIiYRdzYCAzJEEAAAAAAQB
+AAAAAwYSUQMGElUDBhIQAgYIAwYRFAQAABJRBAAAElUFAAEBElUEAAASEAMAAAEECAASUQQIABJV
+BAgAEhAIAQAIAAAAAAAeAQABAFQCFldyYXBOb25FeGNlcHRpb25UaHJvd3MBCAEAAgAAAAAAKAEA
+I1NUX2QxZGNjNTA0MjFjZTQ2Yjk5YTlkZjU4NDBlYmM2OWE5AAAFAQAAAAAWAQARQ29weXJpZ2h0
+IEAgIDIwMTMAAEkBABouTkVURnJhbWV3b3JrLFZlcnNpb249djQuNwEAVA4URnJhbWV3b3JrRGlz
+cGxheU5hbWUSLk5FVCBGcmFtZXdvcmsgNC43tAAAAM7K774BAAAAkQAAAGxTeXN0ZW0uUmVzb3Vy
+Y2VzLlJlc291cmNlUmVhZGVyLCBtc2NvcmxpYiwgVmVyc2lvbj00LjAuMC4wLCBDdWx0dXJlPW5l
+dXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkjU3lzdGVtLlJlc291cmNlcy5S
+dW50aW1lUmVzb3VyY2VTZXQCAAAAAAAAAAAAAABQQURQQURQtAAAALAzAAAAAAAAAAAAAMozAAAA
+IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC8MwAAAAAAAAAAAAAAAF9Db3JEbGxNYWluAG1zY29yZWUu
+ZGxsAAAAAAD/JQAgABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAQAQAAAAGAAAgAAAAAAAAAAAAAAAAAAAAQABAAAAMAAAgAAAAAAAAAAAAAAAAAAAAQAAAAAA
 SAAAAFhAAAAaBAAAAAAAAAAAAAAaBDQAAABWAFMAXwBWAEUAUgBTAEkATwBOAF8ASQBOAEYATwAA
-AAAAvQTv/gAAAQAAAAEANXPAJQAAAQA1c8AlPwAAAAAAAAAEAAAAAgAAAAAAAAAAAAAAAAAAAEQA
+AAAAvQTv/gAAAQAAAAEAaU7BJQAAAQBpTsElPwAAAAAAAAAEAAAAAgAAAAAAAAAAAAAAAAAAAEQA
 AAABAFYAYQByAEYAaQBsAGUASQBuAGYAbwAAAAAAJAAEAAAAVAByAGEAbgBzAGwAYQB0AGkAbwBu
 AAAAAAAAALAEegMAAAEAUwB0AHIAaQBuAGcARgBpAGwAZQBJAG4AZgBvAAAAVgMAAAEAMAAwADAA
 MAAwADQAYgAwAAAAGgABAAEAQwBvAG0AbQBlAG4AdABzAAAAAAAAACIAAQABAEMAbwBtAHAAYQBu
 AHkATgBhAG0AZQAAAAAAAAAAAHAAJAABAEYAaQBsAGUARABlAHMAYwByAGkAcAB0AGkAbwBuAAAA
 AABTAFQAXwBkADEAZABjAGMANQAwADQAMgAxAGMAZQA0ADYAYgA5ADkAYQA5AGQAZgA1ADgANAAw
 AGUAYgBjADYAOQBhADkAAAA+AA8AAQBGAGkAbABlAFYAZQByAHMAaQBvAG4AAAAAADEALgAwAC4A
-OQA2ADYANAAuADIAOQA0ADkAMwAAAAAAcAAoAAEASQBuAHQAZQByAG4AYQBsAE4AYQBtAGUAAABT
+OQA2ADYANQAuADIAMAAwADcAMwAAAAAAcAAoAAEASQBuAHQAZQByAG4AYQBsAE4AYQBtAGUAAABT
 AFQAXwAwADMANABlADkAOQA3AGQAMABkAGIAZgA0AGQANQA4ADkAYQA0ADEAZQA1AGMAYQA4AGYA
 ZgA0ADgAYwAyADAALgBkAGwAbAAAAEgAEgABAEwAZQBnAGEAbABDAG8AcAB5AHIAaQBnAGgAdAAA
 AEMAbwBwAHkAcgBpAGcAaAB0ACAAQAAgACAAMgAwADEAMwAAACoAAQABAEwAZQBnAGEAbABUAHIA
@@ -615,15 +565,15 @@ AG0AZQAAAFMAVABfADAAMwA0AGUAOQA5ADcAZAAwAGQAYgBmADQAZAA1ADgAOQBhADQAMQBlADUA
 YwBhADgAZgBmADQAOABjADIAMAAuAGQAbABsAAAAaAAkAAEAUAByAG8AZAB1AGMAdABOAGEAbQBl
 AAAAAABTAFQAXwBkADEAZABjAGMANQAwADQAMgAxAGMAZQA0ADYAYgA5ADkAYQA5AGQAZgA1ADgA
 NAAwAGUAYgBjADYAOQBhADkAAABCAA8AAQBQAHIAbwBkAHUAYwB0AFYAZQByAHMAaQBvAG4AAAAx
-AC4AMAAuADkANgA2ADQALgAyADkANAA5ADMAAAAAAEYADwABAEEAcwBzAGUAbQBiAGwAeQAgAFYA
-ZQByAHMAaQBvAG4AAAAxAC4AMAAuADkANgA2ADQALgAyADkANAA5ADMAAAAAAAAAAAAAAAAAAAAA
+AC4AMAAuADkANgA2ADUALgAyADAAMAA3ADMAAAAAAEYADwABAEEAcwBzAGUAbQBiAGwAeQAgAFYA
+ZQByAHMAaQBvAG4AAAAxAC4AMAAuADkANgA2ADUALgAyADAAMAA3ADMAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAMAAAAEDMAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAMAAAA3DMAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -659,7 +609,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</BinaryItem>
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
-              SQLTask:Connection="{63D1E2B0-E900-4BCC-B263-2E6CCDA3D58D}"
+              SQLTask:Connection="{F5A22BDA-CAAC-42E0-8E5D-DE1B3C9C8614}"
               SQLTask:SqlStatementSource="ALTER DATABASE Diamond360_RawData_New SET SINGLE_USER WITH ROLLBACK IMMEDIATE&#xA;ALTER DATABASE Diamond360_RawData SET SINGLE_USER WITH ROLLBACK IMMEDIATE&#xA;&#xA;ALTER DATABASE Diamond360_RawData MODIFY NAME = Diamond360_RawData_Old&#xA;ALTER DATABASE Diamond360_RawData_New MODIFY NAME = Diamond360_RawData&#xA;&#xA;ALTER DATABASE Diamond360_RawData SET MULTI_USER&#xA;ALTER DATABASE Diamond360_RawData_Old SET MULTI_USER&#xA;&#xA;ALTER DATABASE Diamond360_RawData  SET RECOVERY FULL WITH NO_WAIT"
               SQLTask:ServerVersion="9"
               SQLTask:ExtendedLogging="True"
@@ -681,7 +631,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</BinaryItem>
           <DTS:Variables />
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
-              SQLTask:Connection="{63D1E2B0-E900-4BCC-B263-2E6CCDA3D58D}"
+              SQLTask:Connection="{F5A22BDA-CAAC-42E0-8E5D-DE1B3C9C8614}"
               SQLTask:SqlStatementSource="USE Diamond360_RawData&#xA;GO&#xA;&#xA;IF EXISTS (SELECT * FROM sys.database_principals WHERE name = N'jdauser')&#xA;DROP USER [jdauser]&#xA;GO&#xA;&#xA;CREATE USER [jdauser] FOR LOGIN [jdauser] WITH DEFAULT_SCHEMA=[jdauser]&#xA;GO&#xA;&#xA;ALTER ROLE [db_owner] ADD MEMBER [jdauser]&#xA;GO &#xA;"
               SQLTask:ServerVersion="9"
               SQLTask:ExtendedLogging="True"
@@ -749,70 +699,16 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</BinaryItem>
               VSTAMajorVersion="17"
               VSTAMinorVersion="0"
               Language="CSharp"
-              ReadOnlyVariables="System::PackageName, System::SourceName, System::SourceDescription, System::ErrorDescription, System::ErrorCode">
+              ReadOnlyVariables="System::PackageName, System::SourceName, System::SourceDescription, System::ErrorDescription, System::ErrorCode,$Project::SMTPServer,$Project::SMTPUserName,$Project::SMTPPassword">
               <ProjectItem
-                Name="ScriptMain.cs"
-                Encoding="UTF8"><![CDATA[#region Namespaces
-using System;
-using System.Data;
-using Microsoft.SqlServer.Dts.Runtime;
-using System.Windows.Forms;
-using System.Net.Mail;
-using System.Net;
-#endregion
-
-namespace ST_d1dcc50421ce46b99a9df5840ebc69a9
-{
-    [Microsoft.SqlServer.Dts.Tasks.ScriptTask.SSISScriptTaskEntryPointAttribute]
-    public partial class ScriptMain : Microsoft.SqlServer.Dts.Tasks.ScriptTask.VSTARTScriptObjectModelBase
-    {
-        public void Main()
-        {
-            string packageName = Dts.Variables["System::PackageName"].Value.ToString();
-            string sourceName = Dts.Variables["System::SourceName"].Value.ToString();
-            string sourceDescription = Dts.Variables["System::SourceDescription"].Value.ToString();
-            string errorDescription = Dts.Variables["System::ErrorDescription"].Value.ToString();
-            int errorCode = (int)Dts.Variables["System::ErrorCode"].Value;
-
-            string errorMessage =
-                "Error Details:\n\n" +
-                "Package – " + packageName + ".dtsx\n\n" +
-                "Task – " + sourceName + "\n\n" +
-                "Task Type (SSIS Component) – " + sourceDescription + "\n\n" +
-                "Error Description – " + errorDescription + "\n\n" +
-                "Error Code – " + errorCode.ToString() + "\n\n";
-
-            string smtpServer = "email-smtp.us-east-1.amazonaws.com";
-
-            System.Net.ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
-            string formattedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            MailMessage htmlMessage = new MailMessage();
-            SmtpClient mySmtpClient;
-
-            htmlMessage.From = new MailAddress("ErrorOnCycle@judydiamond.com");
-            htmlMessage.To.Add(new MailAddress("harshah@synoptek.com"));
-            htmlMessage.CC.Add("hvaghasiya@synoptek.com");
-            htmlMessage.Subject = "Diamond360_DataCycle_Error" + " @ " + formattedDate;
-            htmlMessage.IsBodyHtml = true;
-            htmlMessage.Body = errorMessage;
-
-            mySmtpClient = new SmtpClient(smtpServer);
-            mySmtpClient.Port = 587;
-            mySmtpClient.Credentials = new NetworkCredential("AKIATN243CRFEH4NLTVX", "BHsyt7c3xysQ7TfkDODRbF+Lew7+x3goEJDzt1n65BK9");
-            mySmtpClient.EnableSsl = true;
-            mySmtpClient.Send(htmlMessage);
-
-            Dts.TaskResult = (int)ScriptResults.Success;
-        }
-
-        enum ScriptResults
-        {
-            Success = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Success,
-            Failure = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Failure
-        };
-
-    }
-}]]></ProjectItem>
+                Name="Properties\Settings.settings"
+                Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
+<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
+  <Profiles>
+    <Profile Name="(Default)" />
+  </Profiles>
+  <Settings />
+</SettingsFile>]]></ProjectItem>
               <ProjectItem
                 Name="Properties\Resources.resx"
                 Encoding="UTF8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
@@ -933,35 +829,6 @@ namespace ST_d1dcc50421ce46b99a9df5840ebc69a9
   </resheader>
 </root>]]></ProjectItem>
               <ProjectItem
-                Name="Properties\Settings.Designer.cs"
-                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
-// <auto-generated>
-//     This code was generated by a tool.
-//
-//     Changes to this file may cause incorrect behavior and will be lost if
-//     the code is regenerated.
-// </auto-generated>
-//------------------------------------------------------------------------------
-
-[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties.Settings.get_Default():ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties.Sett" +
-    "ings")]
-
-namespace ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties {
-    
-    
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-        
-        [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-        private static Settings defaultInstance = new Settings();
-        
-        public static Settings Default {
-            get {
-                return defaultInstance;
-            }
-        }
-    }
-}]]></ProjectItem>
-              <ProjectItem
                 Name="ST_d2e720742fed445a82b5e4e37d10cb85.csproj"
                 Encoding="UTF8"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -1048,6 +915,71 @@ namespace ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties {
   </ProjectExtensions>
 </Project>]]></ProjectItem>
               <ProjectItem
+                Name="ScriptMain.cs"
+                Encoding="UTF8"><![CDATA[#region Namespaces
+using System;
+using System.Data;
+using Microsoft.SqlServer.Dts.Runtime;
+using System.Windows.Forms;
+using System.Net.Mail;
+using System.Net;
+#endregion
+
+namespace ST_d1dcc50421ce46b99a9df5840ebc69a9
+{
+    [Microsoft.SqlServer.Dts.Tasks.ScriptTask.SSISScriptTaskEntryPointAttribute]
+    public partial class ScriptMain : Microsoft.SqlServer.Dts.Tasks.ScriptTask.VSTARTScriptObjectModelBase
+    {
+        public void Main()
+        {
+            string packageName = Dts.Variables["System::PackageName"].Value.ToString();
+            string sourceName = Dts.Variables["System::SourceName"].Value.ToString();
+            string sourceDescription = Dts.Variables["System::SourceDescription"].Value.ToString();
+            string errorDescription = Dts.Variables["System::ErrorDescription"].Value.ToString();
+            int errorCode = (int)Dts.Variables["System::ErrorCode"].Value;
+
+            string errorMessage =
+                "Error Details:\n\n" +
+                "Package – " + packageName + ".dtsx\n\n" +
+                "Task – " + sourceName + "\n\n" +
+                "Task Type (SSIS Component) – " + sourceDescription + "\n\n" +
+                "Error Description – " + errorDescription + "\n\n" +
+                "Error Code – " + errorCode.ToString() + "\n\n";
+
+            string smtpServer = Dts.Variables["$Project::SMTPServer"].Value.ToString();
+            string smtpUserName = Dts.Variables["$Project::SMTPUserName"].Value.ToString();
+            string smtpPassword = Dts.Variables["$Project::SMTPPassword"].Value.ToString();
+
+            System.Net.ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+            string formattedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            MailMessage htmlMessage = new MailMessage();
+            SmtpClient mySmtpClient;
+
+            htmlMessage.From = new MailAddress("ErrorOnCycle@judydiamond.com");
+            htmlMessage.To.Add(new MailAddress("harshah@synoptek.com"));
+            htmlMessage.CC.Add("hvaghasiya@synoptek.com");
+            htmlMessage.Subject = "Diamond360_DataCycle_Error" + " @ " + formattedDate;
+            htmlMessage.IsBodyHtml = true;
+            htmlMessage.Body = errorMessage;
+
+            mySmtpClient = new SmtpClient(smtpServer);
+            mySmtpClient.Port = 587;
+            mySmtpClient.Credentials = new NetworkCredential(smtpUserName, smtpPassword);
+            mySmtpClient.EnableSsl = true;
+            mySmtpClient.Send(htmlMessage);
+
+            Dts.TaskResult = (int)ScriptResults.Success;
+        }
+
+        enum ScriptResults
+        {
+            Success = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Success,
+            Failure = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Failure
+        };
+
+    }
+}]]></ProjectItem>
+              <ProjectItem
                 Name="Project"
                 Encoding="UTF16LE"><![CDATA[<?xml version="1.0" encoding="UTF-16" standalone="yes"?>
 <c:Project xmlns:c="http://schemas.microsoft.com/codeprojectml/2010/08/main" xmlns:msb="http://schemas.microsoft.com/developer/msbuild/2003" runtimeVersion="4.0" schemaVersion="1.0">
@@ -1067,6 +999,35 @@ namespace ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties {
     <msb:File Include="ScriptMain.cs" />
   </msb:ItemGroup>
 </c:Project>]]></ProjectItem>
+              <ProjectItem
+                Name="Properties\Settings.Designer.cs"
+                Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+[assembly: global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope="member", Target="ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties.Settings.get_Default():ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties.Sett" +
+    "ings")]
+
+namespace ST_d1dcc50421ce46b99a9df5840ebc69a9.Properties {
+    
+    
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
+        [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+        private static Settings defaultInstance = new Settings();
+        
+        public static Settings Default {
+            get {
+                return defaultInstance;
+            }
+        }
+    }
+}]]></ProjectItem>
               <ProjectItem
                 Name="Properties\AssemblyInfo.cs"
                 Encoding="UTF8"><![CDATA[using System.Reflection;
@@ -1097,15 +1058,6 @@ using System.Runtime.CompilerServices;
 // by using the '*' as shown below:
 
 [assembly: AssemblyVersion("1.0.*")]]]></ProjectItem>
-              <ProjectItem
-                Name="Properties\Settings.settings"
-                Encoding="UTF8"><![CDATA[<?xml version='1.0' encoding='iso-8859-1'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
-</SettingsFile>]]></ProjectItem>
               <ProjectItem
                 Name="Properties\Resources.Designer.cs"
                 Encoding="UTF8"><![CDATA[//------------------------------------------------------------------------------

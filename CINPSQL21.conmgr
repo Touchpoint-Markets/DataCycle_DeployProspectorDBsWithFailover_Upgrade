@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="CINPSQL21"
+  DTS:DTSID="{F5A22BDA-CAAC-42E0-8E5D-DE1B3C9C8614}"
+  DTS:CreationName="ADO.NET:SQL">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Data Source=10.9.57.8;User ID=jdauser;Persist Security Info=True;Connect Timeout=30;TrustServerCertificate=True;Application Name=SSIS-Diamond360_Production_Deployment-{F5A22BDA-CAAC-42E0-8E5D-DE1B3C9C8614}CINPSQL21;">
+      <DTS:Password
+        DTS:Name="Password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAg891u4hqXkyEyRvKd79XqgAAAAACAAAAAAAQZgAAAAEAACAAAAAFJgOU38WWbLwecUDMSjzPe10vtUOajlUEy95du/zwKgAAAAAOgAAAAAIAACAAAADKpza5Q/CHEqj7czyn0cS24Dho5oug73q9RCI4s5pdBIAAAABkceTd0sqjrSgduVwBPHuC/APR/TS4VlCbuGoUsXjzfIDySzI5JwPHe9QUlo/iQkMOdF+ogdaqsZQjI/Z3jksm64Rvz+C/croJ2pBZSnNIjyvhwz5facTS9fWEZl3jPEvb8b9y420Tq7NVGWjwJ8CxzYfX7UFo3DppHCkxTHLxekAAAAClJpynIO5nx8c6mMEMJo0UsL+YZysNhbAXvTGW8Di98MqyqFQqFTcAm1zBxVue32fMqWmVcrPyZN517e3zDN7n</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
