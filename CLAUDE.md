@@ -29,7 +29,7 @@ Executes the T-SQL stored procedure `Diamond360.dbo.MOVE_APIDATA_QATOLIVE` on th
 ### `Diamond360_RawData_Production_Deployment.dtsx`
 Handles raw data deployment for the Diamond360 database, followed by a completion notification email via C# Script Task.
 
-Both packages use **C# Script Tasks** (VSTA 17.0, .NET, `System.Net.Mail`) to send email notifications on completion.
+Both packages use **C# Script Tasks** (VSTA 17.0, .NET 4.7, `System.Net.Mail`) to send email notifications on completion — both a success mail and an OnError event-handler mail. All 4 Script Tasks read SMTP credentials from project parameters (see below) via `Dts.Variables["$Project::SMTPServer"]` etc.
 
 ## Connection Managers
 
@@ -39,17 +39,28 @@ Each package defines these connection managers (parameters override values at ru
 |------|------|--------|
 | `CINPSQL21` | ADO.NET (SQL) | `Data Source=10.9.57.8`, user `jdauser` |
 | `CINPSQL21.NYC.AMLAW.CORP.jdauser` | OLE DB (SQLNCLI11.1) | Same server, used for legacy OLE DB tasks |
-| `SMTP Connection Manager` | SMTP | `smtp-relay.gmail.com`, SSL, Windows auth |
 
-The OLE DB connection (`CINPSQL21.NYC.AMLAW.CORP.jdauser`) appears only in `Diamond360_Production_Deployment.dtsx`.
-
-## Sensitive Data / Protection Level
-
-The project uses `EncryptSensitiveWithUserKey` protection level. Passwords and sensitive connection properties are encrypted to the **Windows user who last saved the project**. When opening the project on a different machine or user account, SSIS will prompt for sensitive values (passwords). For CI/CD or server deployment, use environment variables or SSIS Catalog parameters to override sensitive connection strings rather than storing them in the package.
+The OLE DB connection (`CINPSQL21.NYC.AMLAW.CORP.jdauser`) appears only in `Diamond360_Production_Deployment.dtsx`. A project-level `CINPSQL21.conmgr` connection manager file is also present.
 
 ## Project Parameters
 
-`Project.params` is currently empty — all connection overrides are package-level parameters defined in the project manifest (`DataCycle_DeployProspectorDBsWithFailover_Upgrade.dtproj` under `<SSIS:DeploymentInfo>`). These are configured post-deployment via SSIS Catalog environment mappings.
+`Project.params` defines three project-level parameters used by all mail Script Tasks in both packages:
+
+| Parameter | Sensitive | Purpose |
+|-----------|-----------|---------|
+| `SMTPServer` | No | SMTP host (default: `email-smtp.us-east-1.amazonaws.com`) |
+| `SMTPUserName` | No | SMTP auth username |
+| `SMTPPassword` | Yes | SMTP auth password |
+
+To change SMTP credentials, update the `Value` elements in `Project.params` — or override via SSIS Catalog environment mappings after deployment. Each parameter **must** have a unique GUID in its `ID` property; empty IDs cause a "Duplicate component name" load error.
+
+When adding new project parameters to `Project.params`, always provide a unique GUID for the `<SSIS:Property SSIS:Name="ID">` field. Generate one with: `[guid]::NewGuid()` in PowerShell.
+
+When adding project parameters to a Script Task, list them in the `ScriptProject` element's `ReadOnlyVariables` attribute (e.g. `$Project::SMTPServer`) **and** read them in C# via `Dts.Variables["$Project::SMTPServer"].Value.ToString()`. Both steps are required — omitting `ReadOnlyVariables` blocks runtime access.
+
+## Sensitive Data / Protection Level
+
+The project uses `EncryptSensitiveWithUserKey` protection level. Passwords and sensitive connection properties are encrypted to the **Windows user who last saved the project**. When opening the project on a different machine or user account, SSIS will prompt for sensitive values (passwords). For CI/CD or server deployment, use SSIS Catalog environment mappings to override sensitive parameters rather than storing them in the package.
 
 ## Ignored Files
 
