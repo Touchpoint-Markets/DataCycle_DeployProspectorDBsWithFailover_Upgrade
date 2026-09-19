@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="CINPSQL20"
+  DTS:DTSID="{0FBD0828-F61A-4A66-880C-47C3F0AA408A}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectRetryCount="1"
+      DTS:ConnectRetryInterval="5"
+      DTS:ConnectionString="Data Source=10.9.51.101\processing;User ID=jdauser;Initial Catalog=Diamond360;Provider=SQLNCLI11.1;Persist Security Info=True;Application Name=SSIS-DeployProspectorDBsWithFailover-{0FBD0828-F61A-4A66-880C-47C3F0AA408A}10.9.51.101\processing.Diamond360.jdauser;Auto Translate=False;">
+      <DTS:Password
+        DTS:Name="Password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAYDO1NpQJ40OaOhCTZzB6BAAAAAACAAAAAAAQZgAAAAEAACAAAADRNe19Tcr3+upkP8J8zIV5w2O8SkxvxVOfdZDMKhZwDgAAAAAOgAAAAAIAACAAAABmOUO+TBYEwxK0EGKH/H4C2qur275oQbmTYX50pHCBzoAAAADgFMZUvdkCqKhgjZ+cdtIQAoVtJsKsJETT6pPWq1uWpb335oJt0BdoWK61e5ADmtMpEJm0sThtNfbQe5ryVC0hm0uUFmpJNp+Oz4A2+9ZtphTTDV9If1Ltb/yoLjwrLb0xdMXxcVRGeqCcLdpWOGYicYMuDtr04JT9WjGZAv6yTkAAAABw4cqDDsfqQp5o4/Q13NlN5SJHGtv8zTRY8AhvjtZGXzKcLUkNV/vkIE9rX/jJArhudCELNh5BcQxxE7T/VDc0</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
